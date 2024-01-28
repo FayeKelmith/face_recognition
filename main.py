@@ -1,8 +1,15 @@
 import cv2 as cv
 import face_recognition as fr 
 
+#to be used with pi camera
+#import picamera
+#import numpy as np
+
+
 font = cv.FONT_HERSHEY_SIMPLEX
 
+
+#TODO: to be commented out when using pi camera
 width = 640
 height = 360
 cam = cv.VideoCapture(0)
@@ -12,25 +19,21 @@ cam.set(cv.CAP_PROP_FPS, 15)
 cam.set(cv.CAP_PROP_FOURCC, cv.VideoWriter_fourcc(*'MJPG'))
 
 
-kelmith = fr.load_image_file("./images/known/Faye Kelmith.jpg")
+
+
+kelmith = fr.load_image_file("./images/known/arnold.jpg")
 #detect face location
 faceLocation = fr.face_locations(kelmith)[0]
 #encode face
-donFaceEncoding = fr.face_encodings(kelmith)[0]
+kelmithFaceEncoding = fr.face_encodings(kelmith)[0]
 
-# Nancy Pelosi
-
-nancy = fr.load_image_file("./images/known/Nancy Pelosi.jpg")
-nancyFaceLocation = fr.face_locations(nancy)[0]
-nancyFaceEncoding = fr.face_encodings(nancy)[0]
-
+print(kelmithFaceEncoding)
 #bookkeeping
-knownEncodings = [donFaceEncoding, nancyFaceEncoding]
-names = ["Faye Kelmith", "Nancy Pelosi"]
-
-#unknown image
+knownEncodings = []
+names = ["Arnold Schwarzenegger"]
 
 while True:
+    
     ignore, unknown = cam.read()
     
     unknownFace = cv.cvtColor(unknown, cv.COLOR_RGB2BGR)

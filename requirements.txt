@@ -1,3 +1,4 @@
 opencv-python
 Cmake
 face-recognition
+streamlit
