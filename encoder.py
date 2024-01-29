@@ -80,7 +80,7 @@ def main():
             album_path = os.path.join(known_faces,album)
             album_encoding_mean = encode_photo_set(album_path)
             
-            album_encoding_mean = np.insert(album_encoding_mean,0,album,axis=0) #insert name at the beginning of the array 
+            album_encoding_mean = np.insert(album_encoding_mean,0,album) #insert name at the beginning of the array 
             writer.writerow(album_encoding_mean)
         logging.info("Saved encodings to csv file")     
         
