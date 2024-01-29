@@ -3,3 +3,4 @@ Cmake
 face-recognition
 streamlit
 supabase
+python-dotenv
