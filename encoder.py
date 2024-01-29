@@ -11,22 +11,20 @@ def download_images():
     # list all folders in the bucket
     folders  = supabase.storage.from_("images").list()
 
-    for folder in folders:
-        
+    for folder in folders: 
         #Create local folder in known_faces/folder_name and if it exists, skip
         new_path = os.path.join(known_faces, folder["name"])
         if not os.path.exists(new_path):
             files = supabase.storage.from_("images").list(folder["name"])
             os.mkdir(known_faces + folder["name"]) #create folder
-            # os.chdir(known_faces + folder["name"]) #change directory to new folder
+
             for file in files:
                 #download file
                 file_path = os.path.join(new_path,file["name"])
                 with open(file_path,"wb+") as f:
                     data = supabase.storage.from_("images").download(f"{folder['name']}/{file['name']}")
                     f.write(data)
-                    print(f"Downloading {file['name']}")
-                    
+                    print(f"Downloading {file['name']}")                
                 
                 print("---------------------")
         else:
@@ -41,15 +39,8 @@ def encode_image(img_path):
         logging.warning("No face found in image")
         return
     
-    # top,right,bottom,left = face_location #unpack tuple
-    
-    # face = picture[top:bottom,left:right] #crop image
-    
-    # print(f"face location: {face_location}")
-    
     face_encodings = fr.face_encodings(picture) #encode face
     
-    # print(f"Face encoding: {face_encodings}")
     return face_encodings
 
 def encode_photo_set(path):
@@ -63,10 +54,14 @@ def encode_photo_set(path):
     features_list = []
     for photo in photos_list:
         photo_path = os.path.join(path,photo)
-        features_list.append(encode_image(photo_path)) #append face encodings to list
+        features_list.append(encode_image(photo_path)) #append 
     
     
     features_mean = np.array(features_list, dtype=object).mean(axis=0) #calculate mean of face encodings   
+    
+    if features_mean is None:
+        logging.warning("No face found in image | Terminating")
+        return
     return features_mean 
 
 def main():
@@ -75,8 +70,6 @@ def main():
     
     logging.info("Downloading photos")
     download_images() #download images from supabase
-    
-  
     
     known_photos = os.listdir(known_faces)
     
@@ -89,9 +82,7 @@ def main():
             
             album_encoding_mean = np.insert(album_encoding_mean,0,album,axis=0) #insert name at the beginning of the array 
             writer.writerow(album_encoding_mean)
-        logging.info("Saved encodings to csv file")
-            
-        
+        logging.info("Saved encodings to csv file")     
         
 
 if __name__ == "__main__":
