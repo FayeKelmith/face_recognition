@@ -1,5 +1,9 @@
 from storage import supabase
 import os
+import face_recognition as fr
+import numpy as np
+import logging
+import csv
 
 known_faces = "./images/known/"
 
@@ -28,6 +32,67 @@ def download_images():
         else:
             continue
     print("Download Complete! 🎉 ")
+    
+def encode_image(img_path):
+    picture = fr.load_image_file(img_path)
+    face_location = fr.face_locations(picture)[0] 
+    
+    if face_location is None:
+        logging.warning("No face found in image")
+        return
+    
+    # top,right,bottom,left = face_location #unpack tuple
+    
+    # face = picture[top:bottom,left:right] #crop image
+    
+    # print(f"face location: {face_location}")
+    
+    face_encodings = fr.face_encodings(picture) #encode face
+    
+    # print(f"Face encoding: {face_encodings}")
+    return face_encodings
 
+def encode_photo_set(path):
+    photos_list = os.listdir(path)
+    if len(photos_list) == 0:
+        logging.warning("No photos found in directory")
+        return
+    else:
+        logging.info(f"Encoding photos...")
         
-#download_images()
+    features_list = []
+    for photo in photos_list:
+        photo_path = os.path.join(path,photo)
+        features_list.append(encode_image(photo_path)) #append face encodings to list
+    
+    
+    features_mean = np.array(features_list, dtype=object).mean(axis=0) #calculate mean of face encodings   
+    return features_mean 
+
+def main():
+    
+    logging.basicConfig(level=logging.INFO) #set logging level to info
+    
+    logging.info("Downloading photos")
+    download_images() #download images from supabase
+    
+  
+    
+    known_photos = os.listdir(known_faces)
+    
+    features = "./encodings/features.csv"
+    with open(features,"w+") as f:  #create and open csv file
+        writer = csv.writer(f)
+        for album in known_photos:
+            album_path = os.path.join(known_faces,album)
+            album_encoding_mean = encode_photo_set(album_path)
+            
+            album_encoding_mean = np.insert(album_encoding_mean,0,album,axis=0) #insert name at the beginning of the array 
+            writer.writerow(album_encoding_mean)
+        logging.info("Saved encodings to csv file")
+            
+        
+        
+
+if __name__ == "__main__":
+    main()
