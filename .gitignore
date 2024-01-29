@@ -3,9 +3,10 @@
 __pycache__/
 venv/
 images/
+.env
 *.env
 
-# IDE
+
 .vscode/
 .idea/
 
