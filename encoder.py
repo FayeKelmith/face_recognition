@@ -39,7 +39,7 @@ def encode_image(img_path):
         logging.warning("No face found in image")
         return
     
-    face_encodings = fr.face_encodings(picture) #encode face
+    face_encodings = fr.face_encodings(picture,face_location) #encode face
     
     return face_encodings
 

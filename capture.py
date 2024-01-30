@@ -1,7 +1,6 @@
 import streamlit as st
 from storage import supabase
 from PIL import Image
-import os
 import tempfile
 
 
